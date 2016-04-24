@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-Cn">
+<head>
+  <meta charset="UTF-8">
+  <title>经典坦克大战</title>
+  <link rel=stylesheet href="tankGame.css">
+</head>
+<body onkeydown="fnGetCommand()">
+  <h1>经典坦克大战</h1>
+  <div id="container">
+    <canvas id="tankMap" width="400" height="300">您的浏览器OUT了!</canvas>
+ </div>
+ <div id="jurn"></div>
+ <script src="tankGame.js"></script>
+ <script>
+    var oCanvas = document.getElementById("tankMap");
+    var oCxt = oCanvas.getContext("2d");
+    //创建英雄子弹
+    var aHeroBullet = [];
+    //创建英雄坦克
+    var aHeroTank = [];
+    for (var i=0;i<1;i++) {
+      var oTank = new fnHeroTank(187,270,0,aHeroColor,2);
+      aHeroTank[i] = oTank;
+    }
+    //创建英雄炸弹
+    var aHeroBomb = [];
+    //创建敌人子弹
+    var aEnemyBullet = [];
+    //创建敌人坦克
+    var aEnemyTank = [];
+    for (var i=0;i<4;i++) {
+      var oTank = new fnEnemyTank(80*(i+1),0,2,aEnemyColor,1.5);
+      aEnemyTank[i] = oTank;
+      //让坦克启动
+      window.setInterval("aEnemyTank["+ i +"].run()",50);
+      //创建敌人时，就分配子弹
+      var oBullet = new fnBullet(aEnemyTank[i].x+14,aEnemyTank[i].y+27,2,2,aEnemyTank[i]);
+      aEnemyBullet[i] = oBullet;
+      //子弹飞
+      var oBtimer = window.setInterval("aEnemyBullet["+ (aEnemyBullet.length - 1) +"].run()",50);
+      aEnemyBullet[i].timer = oBtimer;
+    }
+    //创建敌人炸弹
+    var aEnemyBomb = [];
+    //定时刷新画布
+    function fnFlashTankMap(){
+      oCxt.clearRect(0,0,400,300);
+      //画出英雄坦克
+      for (var i=0;i<aHeroTank.length;i++) {
+        fnDrawTank(aHeroTank[i]);
+      }
+      //画出英雄子弹
+      fnDrawBullet(aHeroBullet);
+      //判断是否击中英雄
+      fnIsHit(aEnemyBullet,aHeroTank,aHeroBomb);
+      //英雄坦克炸弹
+      fnDrawBomb(aHeroBomb);
+      //画出敌人坦克
+      for (var i=0;i<aEnemyTank.length;i++) {
+        fnDrawTank(aEnemyTank[i]);
+      }
+      //画出敌人子弹
+      fnDrawBullet(aEnemyBullet);
+      //判断是否击中敌人
+      fnIsHit(aHeroBullet,aEnemyTank,aEnemyBomb);
+      //敌人坦克炸弹
+      fnDrawBomb(aEnemyBomb);
+    }
+    fnFlashTankMap();
+    //用来接受按键命令
+    function fnGetCommand(){
+      var aCode = event.keyCode;//获取acii码
+      switch (aCode) {
+        case 87://W上
+          aHeroTank[0].direct = 0;
+          aHeroTank[0].moveUp();
+          break;
+        case 68://D右
+          aHeroTank[0].direct = 1;
+          aHeroTank[0].moveRight();
+          break;
+        case 83://S下
+          aHeroTank[0].direct = 2;
+          aHeroTank[0].moveDown();
+          break;
+        case 65://A左
+          aHeroTank[0].direct = 3;
+          aHeroTank[0].moveLeft();
+          break;
+        case 74://J射击
+          aHeroTank[0].shot();
+          break;
+      }
+      fnFlashTankMap();
+    }
+    window.setInterval("fnFlashTankMap()",50);
+ </script>
+</body>
+</html>
